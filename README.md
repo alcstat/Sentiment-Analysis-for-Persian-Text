@@ -134,71 +134,7 @@ Dictionary = list("Words"=Dict,"Frequencies"=freqs[-1,])
 }
 ```
 
-Based on the Vector Space approach and the dictionary that we have just built, we are going to turn each comment within the whole body of text which is called corpus into two quantities. The first is the summation of positive weights of all the words appeared within each comment, and the second one is the summation of negative weights.
-``` r
-ExtractFeatures <- function(corpus, dict){
-  
-  tex = corpus$text
-  emoji = corpus$emoji
-  
-  Words = dict$Words
-  dict$Frequencies = dict$Frequencies/rowSums(dict$Frequencies)
-  Frequencies = dict$Frequencies
-  
-  #Progress bar
-  n = length(tex)
-  pb = txtProgressBar(min = 0, max = n, initial = 0, style = 3,
-width = 50, char = "=")
-  
-   x = matrix(rep(0,n*3),nrow =n ,ncol=3)
-  for (i in 1:n) {
-    wordlist = names(sort(table(unlist(strsplit(tex[i], " "))), 
-                          decreasing = TRUE))
-    if(is.null(emoji[[i]])==F){append(wordlist,table(emoji[i]))}
-    x[i,1] = 1 #bias term is set to 1
-    # loop through each word in the list of words
-    for (word in wordlist){ 
-      if (any(Words==word)) {
-        # increment the word count for the neutral label 0
-        x[i,2] = x[i,2]+Frequencies[which(Words==word),1]
-       # increment the word count for the positive label 1
-        x[i,3] = x[i,3]+Frequencies[which(Words==word),2]
-      }
-    }
-    setTxtProgressBar(pb,i)
-  }
- return(x) 
-}
-```
-
-Using the functions defined, we are going to clean our Persian text,
-then build a dictionary, and extract features from the text.
-
-``` r
-TextAd = RefineText(Text)
-Dictionary = BuildFreqs(list("text"=TextAd,"emoji"=Emoji),Y)
-X = ExtractFeatures(list("text"=TextAd,"emoji"=Emoji), Dictionary)
-```
-
-# Checking the features' interpretability
-
-To see whether it is possible to classify our text using the
-features we built, We should check the below scatter plot.
-
-``` r
-mylabel = c("Train Pos", "Train Neg")
-colors = c("blue", "red")
-xlabel = "Sum of Negative Words"
-ylabel = "Sum of Positive Words"
-plot(x = X[Y==0,2], y = X[Y==0,3], xlab = xlabel, ylab = ylabel,col="red")
-points(x = X[Y==1,2], y = X[Y==1,3], col="green")
-```
-
-![000012.png](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000012.png)<!-- -->
-(Polarity defined by Vector Space approach for all comments within the corpus)
-
-
-The first classification method that is widely being used as a trivial and easy-to-implement methodology is Naive Bayes. In the following lines of code, we are going to build two functions by which we can use this method for our data.
+The first classification method that is widely being used as a trivial and easy-to-implement methodology is Naive Bayes. In the following lines of code, we are going to build two functions by which we can use this method for our data. First function is a function that uses the corpus and the dictionary that we just built. This function returns a number that represents the overall sentiment or polarity (p) expressed within a comment.
 
 ``` r
 ExtractSense=function(corpus, dict){
@@ -242,7 +178,7 @@ ExtractSense=function(corpus, dict){
 }
 ```
 
-Also, the predictor function cab  defined as what followed:
+The second one is the predictor function is going to return the accuracy and the predicted polarity for each text.
 
 ``` r
 NaiveBayesPredictor<-function(p,y){
@@ -263,7 +199,7 @@ NaiveBayesPredictor<-function(p,y){
 }
 ```
 
-Now, we want to use this method on our data to build a feature called
+Now, we want to use these functions on our data to build a feature called
 “Sense” that measures the intensity of each comment alongside their
 polarity.
 
@@ -271,7 +207,7 @@ polarity.
 Sense = ExtractSense(list("text"=TextAd,"emoji"=Emoji), Dictionary)
 ```
 
-Now, we can see below how these features look like.
+Now, we can see below how these features are looking like.
 
 ``` r
 pos = which(Sense>1)
@@ -282,9 +218,9 @@ points(x = 1:length(Sense), y= Sense*(Sense>1), col="green")
 points(x = 1:length(Sense), y= Sense*(Sense<1), col="red")
 ```
 
-![Overall Sentiments for each comment based on Naive Bayes approach](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000033.png)<!-- -->
+![000033.png](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000033.png)<!-- -->
+(Overall Sentiments for each comment based on Naive Bayes approach)
 
-# Checking the Accuracies for each Methodology
 
 The accuracy of the Naive Bayes classifier on the training dataset can be
 calculated as follow.
@@ -308,8 +244,70 @@ cat(paste0("Overal Accuracy: \n"),mean(yhat==Y),
     ##  Positive Negative  
     ##  0.9286314 0.7224118
 
-The second classifier is based on vector space models. We are going to
-build such a classifier in the following lines of code.
+The second classifier is based on vector space models. We are going to build such a classifier in the following lines of code. Based on the Vector Space approach and the dictionary that we have just built, we are going to turn each comment within the whole body of text which is called corpus into two quantities. The first is the summation of positive weights of all the words appeared within each comment, and the second one is the summation of negative weights.
+
+``` r
+ExtractFeatures <- function(corpus, dict){
+  
+  tex = corpus$text
+  emoji = corpus$emoji
+  
+  Words = dict$Words
+  dict$Frequencies = dict$Frequencies/rowSums(dict$Frequencies)
+  Frequencies = dict$Frequencies
+  
+  #Progress bar
+  n = length(tex)
+  pb = txtProgressBar(min = 0, max = n, initial = 0, style = 3,
+width = 50, char = "=")
+  
+   x = matrix(rep(0,n*3),nrow =n ,ncol=3)
+  for (i in 1:n) {
+    wordlist = names(sort(table(unlist(strsplit(tex[i], " "))), 
+                          decreasing = TRUE))
+    if(is.null(emoji[[i]])==F){append(wordlist,table(emoji[i]))}
+    x[i,1] = 1 #bias term is set to 1
+    # loop through each word in the list of words
+    for (word in wordlist){ 
+      if (any(Words==word)) {
+        # increment the word count for the neutral label 0
+        x[i,2] = x[i,2]+Frequencies[which(Words==word),1]
+       # increment the word count for the positive label 1
+        x[i,3] = x[i,3]+Frequencies[which(Words==word),2]
+      }
+    }
+    setTxtProgressBar(pb,i)
+  }
+ return(x) 
+}
+```
+
+Using the functions defined, we are going to clean our Persian text, then build a dictionary, and extract features from the text.
+
+``` r
+TextAd = RefineText(Text)
+Dictionary = BuildFreqs(list("text"=TextAd,"emoji"=Emoji),Y)
+X = ExtractFeatures(list("text"=TextAd,"emoji"=Emoji), Dictionary)
+```
+
+To see whether it is possible to classify our text using the features we built, I am going to visualize each comment based on the calculated features with green color for positive comments and red color for negative comments.
+
+``` r
+mylabel = c("Train Pos", "Train Neg")
+colors = c("blue", "red")
+xlabel = "Sum of Negative Words"
+ylabel = "Sum of Positive Words"
+plot(x = X[Y==0,2], y = X[Y==0,3], xlab = xlabel, ylab = ylabel,col="red")
+points(x = X[Y==1,2], y = X[Y==1,3], col="green")
+```
+
+![000012.png](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000012.png)<!-- -->
+(Polarity defined by Vector Space approach for all comments within the corpus)
+
+It can be seen that based on the two features positive and negative comments can be discreminated.
+
+
+In the following, I am going to build a function based on the Vector Space approach. In this function first, I am going to classify a new text as positive, if it is closer to center of positive comments by angel.
 
 ``` r
 VectorSpaceModel= function(x,y){
@@ -329,9 +327,7 @@ VectorSpaceModel= function(x,y){
 }
 ```
 
-The next function is going to calculate (predict) the polarity for
-each comment. Plus, if we input the dependent variable (y) too, it
-gives us the accuracy of the predictions.
+The next function is going to calculate (predict) the polarity for each comment. Plus, if we input the dependent variable (y), it gives us the accuracy of the predictions as well.
 
 ``` r
 VectorSpacePredictor = function(x, y =NA, centers){
@@ -374,8 +370,7 @@ cat(paste0("Overal Accuracy: \n"),mean(yhat==Y),
     ##  Positive Negative  
     ##  0.9601175 0.7463026
 
-The logistic regression classifier accuracy on this dataset can be
-calculated as follow.
+The logistic regression classifier accuracy for this dataset can be calculated as follow.
 
 ``` r
 fitGLM = glm(Y~X[,-1],family="binomial")
