@@ -134,6 +134,8 @@ Dictionary = list("Words"=Dict,"Frequencies"=freqs[-1,])
 }
 ```
 
+# Naive Bayes Classifier
+
 The first classification method that is widely being used as a trivial and easy-to-implement methodology is Naive Bayes. In the following lines of code, we are going to build two functions by which we can use this method for our data. First function is a function that uses the corpus and the dictionary that we just built. This function returns a number that represents the overall sentiment or polarity (p) expressed within a comment.
 
 ``` r
@@ -244,7 +246,9 @@ cat(paste0("Overal Accuracy: \n"),mean(yhat==Y),
     ##  Positive Negative  
     ##  0.9286314 0.7224118
 
-The second classifier is based on vector space models. We are going to build such a classifier in the following lines of code. Based on the Vector Space approach and the dictionary that we have just built, we are going to turn each comment within the whole body of text which is called corpus into two quantities. The first is the summation of positive weights of all the words appeared within each comment, and the second one is the summation of negative weights.
+# Vector Space Classifier
+
+The second classifier is based on Vector Space models. We are going to build such a classifier in the following lines of code. Based on the Vector Space approach and the dictionary that we have just built, we are going to turn each comment within the whole body of text which is called corpus into two quantities. The first is the summation of positive weights of all the words appeared within each comment, and the second one is the summation of negative weights.
 
 ``` r
 ExtractFeatures <- function(corpus, dict){
@@ -369,6 +373,8 @@ cat(paste0("Overal Accuracy: \n"),mean(yhat==Y),
     ## Accuracy for different sentiments: 
     ##  Positive Negative  
     ##  0.9601175 0.7463026
+
+# Logistic regression Classifier
 
 The logistic regression classifier accuracy for this dataset can be calculated as follow.
 
