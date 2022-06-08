@@ -3,14 +3,14 @@ Sentiment Analysis for Persian Text
 
 Sentiment Analysis is a process in which the polarity (positive or
 negative) of a given text (comment, tweets, etc.) is determined. In this
-project, I have performed sentiment analysis for Persian text by
-multiple methodologoes (Naive Bayes, Logistic Regression, Vector Space
+the project, I have performed sentiment analysis for Persian text by
+multiple methodologies (Naive Bayes, Logistic Regression, Vector Space
 Models) in R.
 
 In this project, we are going to develop very basic methodologies for
 sentiment analysis including **Logistic Regression**, **Naive Bayes**,
 and **Vector Space Classification** and test their performance on a
-dataset I have found online.
+the dataset I have found online.
 
 # loading packages
 
@@ -21,7 +21,7 @@ library(PersianStemmer)
 
 # Loading & Preparing the data
 
-loading the DigiKala data related to iPhone that I have found online.
+At this stage, I load the DigiKala data related to the iPhone that I have found online.
 
 ``` r
 dat = read.csv("Data.txt", header = T, encoding = "UTF-8")
@@ -41,8 +41,7 @@ Y = as.numeric(dat$Suggestion==1)
 ```
 
 Defining functions for text cleaning, building up a dictionary, and
-extracitng features. First, the function that prepares the text for the
-analysis.
+extracting features. First, we start with the function that prepares the text for the analysis.
 
 ``` r
 RefineText<- function(tex){
@@ -186,9 +185,9 @@ Dictionary = BuildFreqs(list("text"=TextAd,"emoji"=Emoji),Y)
 X = ExtractFeatures(list("text"=TextAd,"emoji"=Emoji), Dictionary)
 ```
 
-# Checking the features interpretability
+# Checking the features' interpretability
 
-To see weather it is possible to to classify our text using the
+To see whether it is possible to classify our text using the
 features we built, We should check the below scatter plot.
 
 ``` r
@@ -201,12 +200,8 @@ points(x = X[Y==1,2], y = X[Y==1,3], col="green")
 ```
 
 ![Polarity defined by Vector Space approach for all comments within the corpus](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000012.png)<!-- -->
-![Polarity defined by Vector Space approach for all comments within the corpus]()<!-- -->
 
-The first classification method that is widely being used as a trivial
-and easy-to-implement methodology is Naive Bayes. In the following lines
-of code, we are going to build two functions by which we can use this
-method for our data.
+The first classification method that is widely being used as a trivial and easy-to-implement methodology is Naive Bayes. In the following lines of code, we are going to build two functions by which we can use this method for our data.
 
 ``` r
 ExtractSense=function(corpus, dict){
@@ -250,7 +245,7 @@ ExtractSense=function(corpus, dict){
 }
 ```
 
-And, the predictior function will be defined like this:
+Also, the predictor function cab  defined as what followed:
 
 ``` r
 NaiveBayesPredictor<-function(p,y){
@@ -279,7 +274,7 @@ polarity.
 Sense = ExtractSense(list("text"=TextAd,"emoji"=Emoji), Dictionary)
 ```
 
-We can see below how this feature looks like.
+Now, we can see below how these features look like.
 
 ``` r
 pos = which(Sense>1)
@@ -294,7 +289,7 @@ points(x = 1:length(Sense), y= Sense*(Sense<1), col="red")
 
 # Checking the Accuracies for each Methodology
 
-The accuracy of Naive Bayes classifier on the train dataset can be
+The accuracy of the Naive Bayes classifier on the training dataset can be
 calculated as follow.
 
 ``` r
@@ -337,8 +332,8 @@ VectorSpaceModel= function(x,y){
 }
 ```
 
-The next function is going to calculates (predicts) the polarity for
-each comment. Plus, if we input the dependent variable (y) as well it
+The next function is going to calculate (predict) the polarity for
+each comment. Plus, if we input the dependent variable (y) too, it
 gives us the accuracy of the predictions.
 
 ``` r
@@ -361,7 +356,7 @@ VectorSpacePredictor = function(x, y =NA, centers){
 }
 ```
 
-Train accuracy for Vector Space classifier is as follows.
+Train accuracy for the Vector Space classifier is as follows.
 
 ``` r
 fitVS = VectorSpaceModel(X,Y)
@@ -411,14 +406,9 @@ cat(paste0("Overal Accuracy: \n"),mean(yhat==Y),
 
 # Comparison of the three methodologies in a simulation
 
-It is not obvious which method performs better on this dataset. So, we
-run a simulation of 1000 iterations each time we are going to randomly
-split the dataset into train and test. Then we build our models based on
-the train sets and test their performances on the test sets. the results
-we be stored in a matrix and after the simulation will be visualized.
+It is not obvious which method performs better on this dataset. So, we run a simulation of 1000 iterations each time we are going to randomly split the dataset into train and test. Then we build our models based on the train sets and test their performances on the test sets. the results are stored in a matrix and after the simulation will be visualized.
 
-So, the simulation for the defined methodologies is going to be like
-this.
+So, the simulation for the defined methodologies is going to be like this.
 
 ``` r
 PosX = X[Y==1,]
@@ -461,8 +451,7 @@ for(iter in 1:1000){
 }
 ```
 
-So, in the following lines of code, we are going to build a box plot to
-compare the error of each method.
+So, in the following lines of code, we are going to build a box plot to compare the error of each method.
 
 ``` r
 boxplot(Error)
@@ -470,6 +459,5 @@ boxplot(Error)
 
 ![Comparison of the three methodologies by their performances](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000016.png)<!-- -->
 
-It seems obvious now that vector space classifier performs slightly
-better than naive Bayes and significantly better than Logistic
-regression classifier.
+It seems obvious now that the Vector Space classifier performs slightly
+better than Naive Bayes. Also, the Logistic regression classifier has a poor performance.
