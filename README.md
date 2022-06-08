@@ -290,7 +290,7 @@ points(x = 1:length(Sense), y= Sense*(Sense>1), col="green")
 points(x = 1:length(Sense), y= Sense*(Sense<1), col="red")
 ```
 
-![Overall Sentiments for each comment based on Naive Bayes approach](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000016.png)<!-- -->
+![Overall Sentiments for each comment based on Naive Bayes approach](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000033.png)<!-- -->
 
 # Checking the Accuracies for each Methodology
 
