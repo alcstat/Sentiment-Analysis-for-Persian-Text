@@ -2,18 +2,15 @@ Sentiment Analysis for Persian Text
 ================
 
 Sentiment Analysis is a process in which the polarity (positive or
-negative) of a given text (comment, tweets, etc.) is determined. In this
-the project, I have performed sentiment analysis for Persian text by
-multiple methodologies (Naive Bayes, Logistic Regression, Vector Space
-Models) in R.
-
-In this project, we are going to develop very basic methodologies for
-sentiment analysis including **Logistic Regression**, **Naive Bayes**,
-and **Vector Space Classification** and test their performance on a
-the dataset I have found online.
+negative) of a given text (comment, tweets, etc.) is determined. In what follows, I will explain how you can perform sentiment analysis for Persian text based on multiple methodologies ( **Naive Bayes**, **Logistic Regression**, **Vector Space Models** ) in [R](https://www.r-project.org/). Furthermore, I will evaluate their performance on a dataset I have found online. Let us begin!
 
 # loading packages
-
+First off, there are two packages that I have used for the entire coding section. make sure that you have them already installed.
+``` r
+install.packages("rwhatsapp")
+install.packages("PersianStemmer")
+```
+Then, it is time to load the packages.
 ``` r
 library(rwhatsapp)
 library(PersianStemmer)
