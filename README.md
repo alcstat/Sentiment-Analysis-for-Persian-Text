@@ -188,8 +188,8 @@ X = ExtractFeatures(list("text"=TextAd,"emoji"=Emoji), Dictionary)
 
 # Checking the features interpretability
 
-To see, weather it is possible to to classify our text using the
-features we built, We must check the below scatter plot.
+To see weather it is possible to to classify our text using the
+features we built, We should check the below scatter plot.
 
 ``` r
 mylabel <- c("Train Pos", "Train Neg")
