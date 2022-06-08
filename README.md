@@ -455,7 +455,8 @@ So, in the following lines of code, we are going to build a box plot to compare 
 boxplot(Error)
 ```
 
-![Comparison of the three methodologies by their performances](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000016.png)<!-- -->
+![000016.png](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000016.png)<!-- -->
+(Comparison of the three methodologies by their performances)
 
 It seems obvious now that the Vector Space classifier performs slightly
 better than Naive Bayes. Also, the Logistic regression classifier has a poor performance.
