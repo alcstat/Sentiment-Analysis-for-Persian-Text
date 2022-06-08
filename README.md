@@ -37,8 +37,7 @@ Emoji = Corpus$emoji
 Y = as.numeric(dat$Suggestion==1)
 ```
 
-Defining functions for text cleaning, building up a dictionary, and
-extracting features. First, we start with the function that prepares the text for the analysis.
+In Sentiment Analysis, there is a text cleaning section (including removing handles and URLs, removing punctuation, tokenizing, etc.) that the package **PersianStemmer** can handle for us. However, the package **PersianStemmer** cannot get a vector of strings and return it in a format of a cleaned vector. Therefore, I am going to build a function based on the package so it can handle this issue. This function prepares the text for the analysis.
 
 ``` r
 RefineText<- function(tex){
@@ -71,7 +70,7 @@ return(TextAd)
 }
 ```
 
-Now, it is time to build up a dictionary.
+Now, it is time to build a list of all the words that have appeared throughout the corpus along with two measurements. The number of times a particular word appeared in positive and negative comments. This list is called a dictionary. In the next step, we are going to create one.
 
 ``` r
 BuildFreqs <- function(corpus,y) {
@@ -135,8 +134,7 @@ Dictionary = list("Words"=Dict,"Frequencies"=freqs[-1,])
 }
 ```
 
-Finally, a function that uses the dictionary to extract features.
-
+Based on the Vector Space approach and the dictionary that we have just built, we are going to turn each comment within the whole body of text which is called corpus into two quantities. The first is the summation of positive weights of all the words appeared within each comment, and the second one is the summation of negative weights.
 ``` r
 ExtractFeatures <- function(corpus, dict){
   
@@ -196,7 +194,9 @@ plot(x = X[Y==0,2], y = X[Y==0,3], xlab = xlabel, ylab = ylabel,col="red")
 points(x = X[Y==1,2], y = X[Y==1,3], col="green")
 ```
 
-![Polarity defined by Vector Space approach for all comments within the corpus](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000012.png)<!-- -->
+![000012.png](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000012.png)<!-- -->
+(Polarity defined by Vector Space approach for all comments within the corpus)
+
 
 The first classification method that is widely being used as a trivial and easy-to-implement methodology is Naive Bayes. In the following lines of code, we are going to build two functions by which we can use this method for our data.
 
