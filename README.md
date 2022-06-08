@@ -188,8 +188,8 @@ To see whether it is possible to classify our text using the
 features we built, We should check the below scatter plot.
 
 ``` r
-mylabel <- c("Train Pos", "Train Neg")
-colors <- c("blue", "red")
+mylabel = c("Train Pos", "Train Neg")
+colors = c("blue", "red")
 xlabel = "Sum of Negative Words"
 ylabel = "Sum of Positive Words"
 plot(x = X[Y==0,2], y = X[Y==0,3], xlab = xlabel, ylab = ylabel,col="red")
