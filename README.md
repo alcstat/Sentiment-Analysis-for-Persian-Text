@@ -200,7 +200,7 @@ plot(x = X[Y==0,2], y = X[Y==0,3], xlab = xlabel, ylab = ylabel,col="red")
 points(x = X[Y==1,2], y = X[Y==1,3], col="green")
 ```
 
-![](Sentiment-Analysis-for-Persian-Text-in-R/figureS/000012.png)<!-- -->
+![](Sentiment-Analysis-for-Persian-Text-in-R/figures/000012.png)<!-- -->
 
 The first classification method that is widely being used as a trivial
 and easy-to-implement methodology is Naive Bayes. In the following lines
@@ -289,7 +289,7 @@ points(x = 1:length(Sense), y= Sense*(Sense>1), col="green")
 points(x = 1:length(Sense), y= Sense*(Sense<1), col="red")
 ```
 
-![](Sentiment-Analysis-for-Persian-Text-in-R/figureS/000016.png)<!-- -->
+![](Sentiment-Analysis-for-Persian-Text-in-R/figures/000016.png)<!-- -->
 
 # Checking the Accuracies for each Methodology
 
@@ -467,7 +467,7 @@ compare the error of each method.
 boxplot(Error)
 ```
 
-![](Sentiment-Analysis-for-Persian-Text-in-R/figureS/000033.png)<!-- -->
+![](Sentiment-Analysis-for-Persian-Text-in-R/figures/000033.png)<!-- -->
 
 It seems obvious now that vector space classifier performs slightly
 better than naive Bayes and significantly better than Logistic
