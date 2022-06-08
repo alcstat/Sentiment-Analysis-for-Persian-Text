@@ -206,6 +206,8 @@ Now, we want to use these functions on our data to build a feature called
 polarity.
 
 ``` r
+TextAd = RefineText(Text)
+Dictionary = BuildFreqs(list("text"=TextAd,"emoji"=Emoji),Y)
 Sense = ExtractSense(list("text"=TextAd,"emoji"=Emoji), Dictionary)
 ```
 
@@ -289,8 +291,6 @@ width = 50, char = "=")
 Using the functions defined, we are going to clean our Persian text, then build a dictionary, and extract features from the text.
 
 ``` r
-TextAd = RefineText(Text)
-Dictionary = BuildFreqs(list("text"=TextAd,"emoji"=Emoji),Y)
 X = ExtractFeatures(list("text"=TextAd,"emoji"=Emoji), Dictionary)
 ```
 
