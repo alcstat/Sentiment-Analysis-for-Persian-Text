@@ -9,11 +9,13 @@ First off, there are multiple packages that I have used for the entire coding se
 ``` r
 install.packages("rwhatsapp")
 install.packages("PersianStemmer")
+install.packages("plotly")
 ```
 Then, it is time to load the packages.
 ``` r
 library(rwhatsapp)
 library(PersianStemmer)
+library(plotly)
 ```
 
 # Loading & Preparing the data
@@ -214,15 +216,24 @@ Sense = ExtractSense(list("text"=TextAd,"emoji"=Emoji), Dictionary)
 Now, we can see below how these features are looking like.
 
 ``` r
-pos = which(Sense>1)
-neg = which(Sense<1)
-
 plot(x = 1:length(Sense), y = Sense, type = 'bar')
 points(x = 1:length(Sense), y= Sense*(Y==1), col="green")
 points(x = 1:length(Sense), y= Sense*(Y==0), col="red")
+
+colors=Y
+colors[Y==1] ="green"
+colors[Y==0] ="red"
+
+data <- data.frame("x"=1:length(Y), "y"=Sense)
+
+plot_ly(data, x = ~x, y = ~y, type = 'bar',
+        marker = list(color = colors)) %>% 
+layout(title = "Overal Polarity of All the Comments",
+         xaxis = list(title = "Comments"),
+         yaxis = list(title = "Sense"))
 ```
 
-![NaiveBayes](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/NaiveBayes.png)<!-- -->
+![NaiveBayes](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/NaiveBayes1.png)<!-- -->
 (Overall Sentiments for each comment based on Naive Bayes approach)
 
 Naive Bayes seems to perform well enough for the discrimination task. The accuracy of the Naive Bayes classifier on the training dataset can be
@@ -296,15 +307,20 @@ X = ExtractFeatures(list("text"=TextAd,"emoji"=Emoji), Dictionary)
 To see whether it is possible to classify our text using the features we built, I am going to visualize each comment based on the calculated features with green color for positive comments and red color for negative comments.
 
 ``` r
-mylabel = c("Train Pos", "Train Neg")
-colors = c("blue", "red")
 xlabel = "Sum of Negative Words"
 ylabel = "Sum of Positive Words"
 plot(x = X[Y==0,2], y = X[Y==0,3], xlab = xlabel, ylab = ylabel,col="red")
 points(x = X[Y==1,2], y = X[Y==1,3], col="green")
+
+plot_ly(x=X[,2],y=X[,3],
+        text= c(1:length(Y)), hoverinfo = "text",
+        type="scatter",mode="markers", color=as.factor(Y),colors = c("red",  "green")) %>%
+        layout(title = "Comments by the Features built",
+               xaxis = list(title = "Sum of Negative Words"),
+               yaxis = list(title = "Sum of Positive Words"))
 ```
 
-![VectorSpace](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/VectorSpace.png)<!-- -->
+![VectorSpace](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/VectorSpace1.png)<!-- -->
 (Polarity defined by Vector Space approach for all comments within the corpus)
 
 It can be seen that based on the two features positive and negative comments can be discreminated.
@@ -452,9 +468,23 @@ So, in the following lines of code, we are going to build a box plot to compare 
 
 ``` r
 boxplot(Error)
+
+plot_ly(type = 'box') %>%
+  add_boxplot(y = Error[,1], jitter = 0.3, pointpos = -1.8, boxpoints = 'all',
+              marker = list(color = 'rgb(7,40,89)'),
+              line = list(color = 'rgb(7,40,89)'),
+              name = "Vector Spcae Classifier") %>% 
+  add_boxplot(y = Error[,2], jitter = 0.3, pointpos = -1.8, boxpoints = 'all',
+              marker = list(color = 'rgb(9,56,125)'),
+              line = list(color = 'rgb(9,56,125)'),
+              name = "Naive Bayes Classifier") %>%
+  add_boxplot(y = Error[,3], jitter = 0.3, pointpos = -1.8, boxpoints = 'all',
+              marker = list(color = 'rgb(11,64,150)'),
+              line = list(color = 'rgb(11,64,150)'),
+              name = "Logistic Regression Classifier")
 ```
 
-![Comparison](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/Comparison.png)<!-- -->
+![Comparison](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/Comparison1.png)<!-- -->
 (Comparison of the three methodologies by their performances)
 
 It seems obvious now that the Vector Space classifier performs slightly
