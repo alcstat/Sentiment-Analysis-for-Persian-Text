@@ -218,11 +218,11 @@ pos = which(Sense>1)
 neg = which(Sense<1)
 
 plot(x = 1:length(Sense), y = Sense, type = 'bar')
-points(x = 1:length(Sense), y= Sense*(Sense>1), col="green")
-points(x = 1:length(Sense), y= Sense*(Sense<1), col="red")
+points(x = 1:length(Sense), y= Sense*(Y==1), col="green")
+points(x = 1:length(Sense), y= Sense*(Y==0), col="red")
 ```
 
-![000033.png](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000033.png)<!-- -->
+![NaiveBayes](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/NaiveBayes.png)<!-- -->
 (Overall Sentiments for each comment based on Naive Bayes approach)
 
 
@@ -305,7 +305,7 @@ plot(x = X[Y==0,2], y = X[Y==0,3], xlab = xlabel, ylab = ylabel,col="red")
 points(x = X[Y==1,2], y = X[Y==1,3], col="green")
 ```
 
-![000012.png](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000012.png)<!-- -->
+![VectorSpace](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/VectorSpace.png)<!-- -->
 (Polarity defined by Vector Space approach for all comments within the corpus)
 
 It can be seen that based on the two features positive and negative comments can be discreminated.
@@ -455,7 +455,7 @@ So, in the following lines of code, we are going to build a box plot to compare 
 boxplot(Error)
 ```
 
-![000016.png](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/000016.png)<!-- -->
+![Comparison](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/Comparison.png)<!-- -->
 (Comparison of the three methodologies by their performances)
 
 It seems obvious now that the Vector Space classifier performs slightly
