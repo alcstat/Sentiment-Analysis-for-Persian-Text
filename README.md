@@ -225,8 +225,7 @@ points(x = 1:length(Sense), y= Sense*(Y==0), col="red")
 ![NaiveBayes](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/NaiveBayes.png)<!-- -->
 (Overall Sentiments for each comment based on Naive Bayes approach)
 
-
-The accuracy of the Naive Bayes classifier on the training dataset can be
+Naive Bayes seems to perform well enough for the discrimination task. The accuracy of the Naive Bayes classifier on the training dataset can be
 calculated as follow.
 
 ``` r
