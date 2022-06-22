@@ -454,7 +454,8 @@ plot_ly(type = 'box') %>%
   add_boxplot(y = Error[,3], jitter = 0.3, pointpos = -1.8, boxpoints = 'all',
               marker = list(color = 'rgb(11,64,150)'),
               line = list(color = 'rgb(11,64,150)'),
-              name = "Logistic Regression Classifier")
+              name = "Logistic Regression Classifier") %>%
+  layout(title = "Classification Error for the Methods")
 ```
 
 (Comparison of the three methodologies by their performances)
