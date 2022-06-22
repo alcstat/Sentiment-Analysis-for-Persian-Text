@@ -317,7 +317,7 @@ plot_ly(x=X[,2],y=X[,3],
         type="scatter",mode="markers", color=as.factor(Y),colors = c("red",  "green")) %>%
         layout(title = "Comments by the Features built",
                xaxis = list(title = "Sum of Negative Words"),
-               yaxis = list(title = "Sum of Positive Words"))
+               yaxis = list(title = "Sum of Positive Words")) 
 ```
 
 ![VectorSpace](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/VectorSpace1.png)<!-- -->
@@ -481,7 +481,8 @@ plot_ly(type = 'box') %>%
   add_boxplot(y = Error[,3], jitter = 0.3, pointpos = -1.8, boxpoints = 'all',
               marker = list(color = 'rgb(11,64,150)'),
               line = list(color = 'rgb(11,64,150)'),
-              name = "Logistic Regression Classifier")
+              name = "Logistic Regression Classifier") %>%
+  layout(title = "Classification Error for the Methods")
 ```
 
 ![Comparison](https://github.com/alcstat/Sentiment-Analysis-for-Persian-Text-in-R/blob/main/figures/Comparison1.png)<!-- -->
