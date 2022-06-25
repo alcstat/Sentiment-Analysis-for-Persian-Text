@@ -1,52 +1,51 @@
----
-title: "Sentiment Analysis for Persian Text"
-output: html_notebook
----
+#---
+#   "Sentiment Analysis for Persian Text"
+#---
+  
+  
+#  Sentiment Analysis is a process in which the polarity (positive or negative) of a given text (comment, tweets, etc.) is determined. In what follows, I will explain how you can perform sentiment analysis for Persian text based on multiple methodologies ( **Naive Bayes**, **Logistic Regression**, **Vector Space Models** ) in [R](https://www.r-project.org/). Furthermore, I will evaluate their performance on a dataset I have found online. Let us begin!
+  
+  # loading packages
+  
+#  First off, there are multiple packages that I have used for the entire coding section. make sure that you have them already installed.
 
-
-Sentiment Analysis is a process in which the polarity (positive or negative) of a given text (comment, tweets, etc.) is determined. In what follows, I will explain how you can perform sentiment analysis for Persian text based on multiple methodologies ( **Naive Bayes**, **Logistic Regression**, **Vector Space Models** ) in [R](https://www.r-project.org/). Furthermore, I will evaluate their performance on a dataset I have found online. Let us begin!
-
-# loading packages
-
-First off, there are multiple packages that I have used for the entire coding section. make sure that you have them already installed.
-``` {r warning=FALSE}
 install.packages("rwhatsapp")
 install.packages("PersianStemmer")
 install.packages("plotly")
-```
 
-Then, it is time to load the packages.
-``` {r warning=FALSE}
+
+#Then, it is time to load the packages.
+
 library(rwhatsapp)
 library(PersianStemmer)
 library(plotly)
-```
+
 
 # Loading & Preparing the data
 
-At this stage, I load the DigiKala data related to the iPhone that I have found online.
-```{r warning=FALSE}
+#At this stage, I load the DigiKala data related to the iPhone that I have found online.
+
 dat = read.csv("Data.txt", header = T, encoding = "UTF-8")
 #dat=read_excel("Data.xlsx")
 dat=na.omit(dat)
-```
 
 
-By considering the label “1” as “Positive” and the rest of the labels as
-“Negative”, we are preparing the data for creating a model for detecting
-the sentiments from a comment.
 
-```{r}
+#By considering the label “1” as “Positive” and the rest of the labels as
+#“Negative”, we are preparing the data for creating a model for detecting
+#the sentiments from a comment.
+
+
 Corpus=lookup_emoji(dat$Text, text_field = "text")
 Text = Corpus$text
 Emoji = Corpus$emoji
 Y=as.numeric(dat$Suggestion==1)
-```
 
 
-In Sentiment Analysis, there is a text cleaning section (including removing handles and URLs, removing punctuation, tokenizing, etc.) that the package **PersianStemmer** can handle for us. However, the package **PersianStemmer** cannot get a vector of strings and return it in a format of a cleaned vector. Therefore, I am going to build a function based on the package so it can handle this issue. This function prepares the text for the analysis.
 
-```{r}
+#In Sentiment Analysis, there is a text cleaning section (including removing handles and URLs, removing punctuation, tokenizing, etc.) that the package **PersianStemmer** can handle for us. However, the package **PersianStemmer** cannot get a vector of strings and return it in a format of a cleaned vector. Therefore, I am going to build a function based on the package so it can handle this issue. This function prepares the text for the analysis.
+
+
 RefineText<- function(tex){
   n=length(tex)
   TextAd=c()
@@ -60,96 +59,96 @@ RefineText<- function(tex){
     tex[i] = gsub("[\r\n]", "", tex[i])
     tex[i] = gsub('[[:punct:] ]+',' ', tex[i])
     tex[i] = RefineChars(tex[i])
-        
+    
     #,"@","$","%","&","*","،",".....","..."
     if (!(is.na(tex[i]))){
       if (all(tex[i]!=c(""," ","،","،,","‌"))){
         TextAd[i] = PerStem(tex[i], NoEnglish = F, NoNumbers = F,
-                        NoStopwords = T, NoPunctuation = T,
-                        StemVerbs = T, NoPreSuffix = T,
-                    Context = T, StemBrokenPlurals = T,
-                    Transliteration = F)
+                            NoStopwords = T, NoPunctuation = T,
+                            StemVerbs = T, NoPreSuffix = T,
+                            Context = T, StemBrokenPlurals = T,
+                            Transliteration = F)
       }
     }
     setTxtProgressBar(pb,i)
   }
-return(TextAd)
+  return(TextAd)
 }
-```
 
 
-Now, it is time to build a list of all the words that have appeared throughout the corpus along with two measurements. The number of times a particular word appeared in positive and negative comments. This list is called a dictionary. In the next step, we are going to create one.
 
-```{r}
+#Now, it is time to build a list of all the words that have appeared throughout the corpus along with two measurements. The number of times a particular word appeared in positive and negative comments. This list is called a dictionary. In the next step, we are going to create one.
+
+
 BuildFreqs <- function(corpus,y) {
   n = length(y)
-d=1 # dictionary word numerator
-freqs=matrix(c(0,0),ncol = 2) #frequencies for each word
-colnames(freqs)=c("Neg","Pos")
-Dict=c() 
-t=c()
-e=c()
-tex = corpus$text
-emoji = corpus$emoji
-#refining Text removing numbers, stop words, punctuation, and so
-#Progress bar
-pb = txtProgressBar(min = 0, max = n, initial = 0, style = 3, width = 50, char = "=")
-for (i in 1:n) {
-  t = sort(table(unlist(strsplit(tex[i], " "))), decreasing = TRUE)
-  
-  #Building freqs for words
-  for (j in 1:length(t)) {
-    cond = (Dict == names(t)[j])
-    if  (any(cond)) {
-      wh = which(cond)
-      freqs[wh+1,(y[i]+1)] = freqs[wh+1,(y[i]+1)]+t(j) # Adding Frequency
-    } else if(is.null(names(t))==F) {
-      Dict[d] = names(t)[j]
-      if (y[i]==1) {
-        freqs = rbind(freqs,c(0,1)) # Defining Frequency
-      } else {
-        freqs = rbind(freqs,c(1,0)) # Defining Frequency 
-      }
-      d = d+1
-    }
-  }
-  
-  if(is.null(emoji[[i]])==F){
-    e = table(emoji[i])
+  d=1 # dictionary word numerator
+  freqs=matrix(c(0,0),ncol = 2) #frequencies for each word
+  colnames(freqs)=c("Neg","Pos")
+  Dict=c() 
+  t=c()
+  e=c()
+  tex = corpus$text
+  emoji = corpus$emoji
+  #refining Text removing numbers, stop words, punctuation, and so
+  #Progress bar
+  pb = txtProgressBar(min = 0, max = n, initial = 0, style = 3, width = 50, char = "=")
+  for (i in 1:n) {
+    t = sort(table(unlist(strsplit(tex[i], " "))), decreasing = TRUE)
     
-    #Building frequencies for emojis
-    for (j in 1:length(e)) {
-      cond = (Dict == names(e)[j])
+    #Building freqs for words
+    for (j in 1:length(t)) {
+      cond = (Dict == names(t)[j])
       if  (any(cond)) {
         wh = which(cond)
-        freqs[wh+1,(y[i]+1)] = freqs[wh+1,(y[i]+1)]+e[j] 
-        # Adding Frequency
-      } else if(is.null(names(e))==F) {
-        Dict[d] = names(e)[j]
+        freqs[wh+1,(y[i]+1)] = freqs[wh+1,(y[i]+1)]+t(j) # Adding Frequency
+      } else if(is.null(names(t))==F) {
+        Dict[d] = names(t)[j]
         if (y[i]==1) {
           freqs = rbind(freqs,c(0,1)) # Defining Frequency
         } else {
           freqs = rbind(freqs,c(1,0)) # Defining Frequency 
         }
-        
         d = d+1
       }
     }
+    
+    if(is.null(emoji[[i]])==F){
+      e = table(emoji[i])
+      
+      #Building frequencies for emojis
+      for (j in 1:length(e)) {
+        cond = (Dict == names(e)[j])
+        if  (any(cond)) {
+          wh = which(cond)
+          freqs[wh+1,(y[i]+1)] = freqs[wh+1,(y[i]+1)]+e[j] 
+          # Adding Frequency
+        } else if(is.null(names(e))==F) {
+          Dict[d] = names(e)[j]
+          if (y[i]==1) {
+            freqs = rbind(freqs,c(0,1)) # Defining Frequency
+          } else {
+            freqs = rbind(freqs,c(1,0)) # Defining Frequency 
+          }
+          
+          d = d+1
+        }
+      }
+    }
+    
+    setTxtProgressBar(pb,i)
   }
-  
-  setTxtProgressBar(pb,i)
-}
-Dictionary=list("Words"=Dict,"Frequencies"=freqs[-1,])
+  Dictionary=list("Words"=Dict,"Frequencies"=freqs[-1,])
   return(Dictionary)
 }
-```
+
 
 
 # Naive Bayes Classifier
 
-The first classification method that is widely being used as a trivial and easy-to-implement methodology is Naive Bayes. In the following lines of code, we are going to build two functions by which we can use this method for our data. First function is a function that uses the corpus and the dictionary that we just built. This function returns a number that represents the overall sentiment or polarity (p) expressed within a comment.
+#The first classification method that is widely being used as a trivial and easy-to-implement methodology is Naive Bayes. In the following lines of code, we are going to build two functions by which we can use this method for our data. First function is a function that uses the corpus and the dictionary that we just built. This function returns a number that represents the overall sentiment or polarity (p) expressed within a comment.
 
-```{r}
+
 ExtractSense=function(corpus, dict){
   
   tex = corpus$text
@@ -173,7 +172,7 @@ ExtractSense=function(corpus, dict){
   p=rep(0,n)
   
   pb = txtProgressBar(min = 0, max = n, initial = 0, style = 3,
-width = 50, char = "=")
+                      width = 50, char = "=")
   
   for(i in 1:n){
     
@@ -189,11 +188,11 @@ width = 50, char = "=")
   }
   return(p)
 }
-```
 
-The second one is the predictor function is going to return the accuracy and the predicted polarity for each text.
 
-```{r warning=FALSE, include=FALSE}
+#The second one is the predictor function is going to return the accuracy and the predicted polarity for each text.
+
+
 NaiveBayesPredictor<-function(p,y){
   
   D_pos=sum(y==1)
@@ -210,21 +209,20 @@ NaiveBayesPredictor<-function(p,y){
   
   return(list("Yhat"=yhat,"Accuracy"=accuracy))
 }
-```
 
-Now, we want to use these functions on our data to build a feature called
-“Sense” that measures the intensity of each comment alongside their
-polarity.
 
-```{r echo=TRUE, message=FALSE, warning=FALSE, results=FALSE}
+#Now, we want to use these functions on our data to build a feature called
+#“Sense” that measures the intensity of each comment alongside their
+#polarity.
+
 TextAd=RefineText(Text)
 Dictionary=BuildFreqs(list("text"=TextAd,"emoji"=Emoji),Y)
 Sense=ExtractSense(list("text"=TextAd,"emoji"=Emoji), Dictionary)
-```
 
-Now, we can see below how these features are looking like.
 
-```{r  warning=FALSE}
+#Now, we can see below how these features are looking like.
+
+
 colors=Y
 colors[Y==1] ="green"
 colors[Y==0] ="red"
@@ -233,18 +231,18 @@ data <- data.frame("x"=1:length(Y), "y"=Sense)
 
 plot_ly(data, x = ~x, y = ~y, type = 'bar',
         marker = list(color = colors)) %>% 
-layout(title = "Overal Polarity of All the Comments",
+  layout(title = "Overal Polarity of All the Comments",
          xaxis = list(title = "Comments"),
          yaxis = list(title = "Sense"))
-```
-
-(Overall Sentiments for each comment based on Naive Bayes approach)
 
 
+#(Overall Sentiments for each comment based on Naive Bayes approach)
 
-Naive Bayes seems to perform well enough for the discrimination task. The accuracy of the Naive Bayes classifier on the training dataset can be calculated as follow.
 
-```{r}
+
+#Naive Bayes seems to perform well enough for the discrimination task. The accuracy of the Naive Bayes classifier on the training dataset can be calculated as follow.
+
+
 NB=NaiveBayesPredictor(Sense,Y)
 yhat=NB$Yhat
 NBAccuracy=c()
@@ -255,13 +253,13 @@ NBAccuracy["Negative"] =
 cat(paste0("Overal Accuracy: \n"),mean(yhat==Y),
     paste0("\nAccuracy for different sentiments: \n"), names(NBAccuracy),
     paste0(" \n"),NBAccuracy)
-```
+
 
 # Vector Space Classifier
 
-The second classifier is based on Vector Space models. We are going to build such a classifier in the following lines of code. Based on the Vector Space approach and the dictionary that we have just built, we are going to turn each comment within the whole body of text which is called corpus into two quantities. The first is the summation of positive weights of all the words appeared within each comment, and the second one is the summation of negative weights.
+#The second classifier is based on Vector Space models. We are going to build such a classifier in the following lines of code. Based on the Vector Space approach and the dictionary that we have just built, we are going to turn each comment within the whole body of text which is called corpus into two quantities. The first is the summation of positive weights of all the words appeared within each comment, and the second one is the summation of negative weights.
 
-```{r}
+
 ExtractFeatures <- function(corpus, dict){
   
   tex = corpus$text
@@ -274,9 +272,9 @@ ExtractFeatures <- function(corpus, dict){
   #Progress bar
   n = length(tex)
   pb = txtProgressBar(min = 0, max = n, initial = 0, style = 3,
-width = 50, char = "=")
+                      width = 50, char = "=")
   
-   x = matrix(rep(0,n*3),nrow =n ,ncol=3)
+  x = matrix(rep(0,n*3),nrow =n ,ncol=3)
   for (i in 1:n) {
     wordlist = names(sort(table(unlist(strsplit(tex[i], " "))), 
                           decreasing = TRUE))
@@ -287,41 +285,39 @@ width = 50, char = "=")
       if (any(Words==word)) {
         # increment the word count for the neutral label 0
         x[i,2] = x[i,2]+Frequencies[which(Words==word),1]
-       # increment the word count for the positive label 1
+        # increment the word count for the positive label 1
         x[i,3] = x[i,3]+Frequencies[which(Words==word),2]
       }
     }
     setTxtProgressBar(pb,i)
   }
- return(x) 
+  return(x) 
 }
-```
 
-Using the functions defined, we are going to clean our Persian text, then build a dictionary, and extract features from the text.
 
-```{r message=FALSE, warning=FALSE, results=FALSE}
+#Using the functions defined, we are going to clean our Persian text, then build a dictionary, and extract features from the text.
+
 X = ExtractFeatures(list("text"=TextAd,"emoji"=Emoji), Dictionary)
-```
 
-To see whether it is possible to classify our text using the features we built, I am going to visualize each comment based on the calculated features with green color for positive comments and red color for negative comments.
 
-```{r  warning=FALSE}
+#To see whether it is possible to classify our text using the features we built, I am going to visualize each comment based on the calculated features with green color for positive comments and red color for negative comments.
+
 plot_ly(x=X[,2],y=X[,3],
         text= c(1:length(Y)), hoverinfo = "text",
         type="scatter",mode="markers", color=as.factor(Y),colors = c("red",  "green")) %>%
-        layout(title = "Comments by the Features built",
-               xaxis = list(title = "Sum of Negative Words"),
-               yaxis = list(title = "Sum of Positive Words"))
-```
-
-(Polarity defined by Vector Space approach for all comments within the corpus)
-
-It can be seen that based on the two features positive and negative comments can be discreminated.
+  layout(title = "Comments by the Features built",
+         xaxis = list(title = "Sum of Negative Words"),
+         yaxis = list(title = "Sum of Positive Words"))
 
 
-In the following, I am going to build a function based on the Vector Space approach. In this function first, I am going to classify a new text as positive, if it is closer to center of positive comments by angel.
+#(Polarity defined by Vector Space approach for all comments within the corpus)
 
-```{r}
+#It can be seen that based on the two features positive and negative comments can be discreminated.
+
+
+#In the following, I am going to build a function based on the Vector Space approach. In this function first, I am going to classify a new text as positive, if it is closer to center of positive comments by angel.
+
+
 VectorSpaceModel= function(x,y){
   
   pos_center=colMeans(x[y==1,])
@@ -337,12 +333,12 @@ VectorSpaceModel= function(x,y){
   yhat[yhat==2]=0
   return(list("Yhat"=yhat,"Centers"=centers))
 }
-```
 
 
-The next function is going to calculate (predict) the polarity for each comment. Plus, if we input the dependent variable (y), it gives us the accuracy of the predictions as well.
 
-```{r}
+#The next function is going to calculate (predict) the polarity for each comment. Plus, if we input the dependent variable (y), it gives us the accuracy of the predictions as well.
+
+
 VectorSpacePredictor= function(x,y=NA,centers){
   dot_prods=x[,-1]%*%centers
   normX=apply(x[,-1],1,function(x)(sqrt(sum(x^2))))
@@ -360,12 +356,12 @@ VectorSpacePredictor= function(x,y=NA,centers){
   }
   return(list("Yhat"=yhat,"Accuracy"=accuracy))
 }
-```
 
 
-Train accuracy for the Vector Space classifier is as follows.
 
-```{r warning=FALSE}
+#Train accuracy for the Vector Space classifier is as follows.
+
+
 fitVS=VectorSpaceModel(X,Y)
 yhat=fitVS$Yhat
 VSAccuracy=c()
@@ -376,13 +372,13 @@ VSAccuracy["Negative"] =
 cat(paste0("Overal Accuracy: \n"),mean(yhat==Y),
     paste0("\nAccuracy for different sentiments: \n"), names(VSAccuracy),
     paste0(" \n"),VSAccuracy)
-```
+
 
 # Logistic regression Classifier
 
-The logistic regression classifier accuracy for this dataset can be calculated as follow.
+#The logistic regression classifier accuracy for this dataset can be calculated as follow.
 
-```{r warning=FALSE}
+
 fitGLM=glm(Y~X[,-1],family="binomial")
 yhat=round(predict(fitGLM,as.data.frame(X),type="response"),0)
 GLMAccuracy=c()
@@ -393,15 +389,14 @@ GLMAccuracy["Negative"] =
 cat(paste0("Overal Accuracy: \n"),mean(yhat==Y),
     paste0("\nAccuracy for different sentiments: \n"), names(GLMAccuracy),
     paste0(" \n"),GLMAccuracy)
-```
+
 
 # Comparison of the three methodologies in a simulation
 
-It is not obvious which method performs better on this dataset. So, we run a simulation of 1000 iterations each time we are going to randomly split the dataset into train and test. Then we build our models based on the train sets and test their performances on the test sets. the results are stored in a matrix and after the simulation will be visualized.
+#It is not obvious which method performs better on this dataset. So, we run a simulation of 1000 iterations each time we are going to randomly split the dataset into train and test. Then we build our models based on the train sets and test their performances on the test sets. the results are stored in a matrix and after the simulation will be visualized.
 
-So, the simulation for the defined methodologies is going to be like this.
+#So, the simulation for the defined methodologies is going to be like this.
 
-```{r warning=FALSE, include=FALSE}
 PosX = X[Y==1,]
 NegX = X[Y==0,]
 PosSense = Sense[Y==1]
@@ -437,11 +432,11 @@ for(iter in 1:1000){
   
   Error[iter,]=c(1-VS$Accuracy,1-NB$Accuracy,1-(mean(round(labelGLM,0)==TestY)))
 }
-```
 
-So, in the following lines of code, we are going to build a box plot to compare the error of each method.
 
-```{r  warning=FALSE}
+#So, in the following lines of code, we are going to build a box plot to compare the error of each method.
+
+
 plot_ly(type = 'box') %>%
   add_boxplot(y = Error[,1], jitter = 0.3, pointpos = -1.8, boxpoints = 'all',
               marker = list(color = 'rgb(7,40,89)'),
@@ -456,9 +451,9 @@ plot_ly(type = 'box') %>%
               line = list(color = 'rgb(11,64,150)'),
               name = "Logistic Regression Classifier") %>%
   layout(title = "Classification Error for the Methods")
-```
 
-(Comparison of the three methodologies by their performances)
 
-It seems obvious now that the Vector Space classifier performs slightly
-better than Naive Bayes. Also, the Logistic regression classifier has a poor performance.
+#(Comparison of the three methodologies by their performances)
+
+#It seems obvious now that the Vector Space classifier performs slightly
+#better than Naive Bayes. Also, the Logistic regression classifier has a poor performance.
